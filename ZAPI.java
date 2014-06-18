@@ -83,15 +83,7 @@ public class ZAPI {
     private static Object get(final String url)
     {
       try {
-        final HttpURLConnection httpCon = (HttpURLConnection) new URL(url).openConnection();
-        
-        httpCon.setDoOutput(true);
-        httpCon.setRequestMethod("GET");
-        
-        final String encoding = new Base64().encodeToString(CREDENTIALS.getBytes());
-        httpCon.setRequestProperty("Authorization", "Basic " + encoding);
-        
-        httpCon.setRequestProperty("Content-type", "application/json");
+        final HttpURLConnection httpCon = httpCon(url, "GET");
         
         final BufferedReader rd = new BufferedReader(new InputStreamReader(httpCon.getInputStream()));
         final StringBuffer result = new StringBuffer();
@@ -116,5 +108,77 @@ public class ZAPI {
       return null;
     }
    
+   /**
+    * Send a request with JSON content with the specified method
+    * @param url - the URL to send the request to
+    * @param obj - the JSON content to send 
+    * @param method - e.g. PUT
+    */
+    private static void sendRequest(final String url, final JSONObject obj, final String method) {
+      try {
+        
+       final HttpURLConnection httpCon = httpCon(url, method);
+        
+        if(null != obj) {
+          final OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
+          out.write(obj.toString());
+          out.close();
+        }
+        
+        final BufferedReader rd = new BufferedReader(new InputStreamReader(httpCon.getInputStream()));
+        final StringBuffer result = new StringBuffer();
+        String line = "";
+        while(null != (line = rd.readLine())) {
+          result.append(line);
+        }
+      } catch (final IOException e) {
+        e.printStackTrace();
+      } 
+    }
+    
+    /**
+     * Send PUT request to the specified URL
+     * @param url - the URL to send the request to
+     * @param obj - the JSON content to send 
+     */
+     private static void put(final String url, final JSONObject obj) {
+       sendRequest(url, obj, "PUT");
+     }
+     
+    /**
+     * Send POST request to the specified URL
+     * @param url - the URL to send the request to
+     * @param obj - the JSON content to send 
+     */
+     private static void post(final String url, final JSONObject obj) {
+       sendRequest(url, obj, "POST");
+     }
+     
+     /**
+     * Send DELETE request to the specified URL
+     * @param url - the URL to send the request to
+     */
+     private static void delete(final String url) {
+       sendRequest(url, null, "DELETE");
+     }
+     
+     /**
+      * Return a HttpURLConnection object for the specified URL and request method
+      * @param url
+      * @param method - e.g. GET
+      */
+      private static HttpURLConnection httpCon(final String url, final String method) throws IOException{
+        final HttpURLConnection httpCon = (HttpURLConnection) new URL(url).openConnection();
+        
+        httpCon.setDoOutput(true);
+        httpCon.setRequestMethod(method);
+        
+        final String encoding = new Base64().encodeToString(CREDENTIALS.getBytes());
+        httpCon.setRequestProperty("Authorization", "Basic " + encoding);
+        
+        httpCon.setRequestProperty("Content-type", "application/json");
+        
+        return httpCon;
+      }
 }
 
