@@ -41,11 +41,14 @@ public class ZAPI {
   /** URLS */
   private static final String BASE_URL= "http://jira_server:port";
   private static final String ZAPI_URL = BASE_URL + "/rest/zapi/latest/";
-  private static final String JIRA_API_URL = BASE_URL + "/rest/api/latest/";
   
   /** JIRA credentials */
   private static final String CREDENTIALS = "username:password";
   
+  //================================================================================
+  // ZAPI methods
+  //================================================================================
+    
   /**
    * Returns the ID for the specified Version in the specified Project
    * 
@@ -75,6 +78,29 @@ public class ZAPI {
      return null;
    }
    
+   /**
+    * Updates the specified test execution
+    * @param executionId
+    * @param status - e.g. ZAPI_STATUS_PASS
+    * @param comment
+    */
+    public static void updateTestExecution(final String executionId, final int status, final String comment) {
+      //Construct JSON object
+      final JSONObject obj = new JSONObject();
+      try {
+        obj.put("status", String.valueOf(status));
+        obj.put("comment", comment);
+      } catch (final JSONException e) {
+        e.printStackTrace();
+      }
+      //Send PUT request
+      put(ZAPI_URL + "execution/" + executionId + "/execute", obj);
+      }
+    }
+   
+   //================================================================================
+   // HTTP request methods
+   //================================================================================
    
    /**
     * Send GET request to the specified URL
