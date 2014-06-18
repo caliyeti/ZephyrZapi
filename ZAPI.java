@@ -97,7 +97,63 @@ public class ZAPI {
       put(ZAPI_URL + "execution/" + executionId + "/execute", obj);
       }
     }
+    
+    /**
+     * Adds attachement to an execution
+     * @param file - the file to attach
+     * @param executionId
+     */
+     public static void addAttachment(final File file, final String executionId) {
+       try {
+         final HttpPost = new HttpPost(ZAPI_URL + "attachment?entityId=" + executionId + "&entityType=EXECUTION");
+         final String encoding = new Base64().encodeToString(CREDENTIALS.getBytes());
+         httpPost.setHeader("X-Atlassian-Token", "nocheck");
+         httpPost.setHeader("Authorization", "Basic " + encoding);
+         
+         final MultippartEntity mpEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+         final ContentBody cbFile = new FileBody(file);
+         mpEntity.addPart("file", cbfile);
+         httpPost.setEntity(mpEntity);
+         final HttpResponse response = new DefaultHttpClient().execute(httpPost);
+         final HttpEntity resEntity = response.getEntity();
+         
+         if(null != resEntity) {
+           EntityUtils.consume(resEntity);
+         }
+         
+       } catch (final ClientProtocolException e) {
+         e.printStackTrace();
+       } catch (final IOException e) {
+         e.printStackTrace();
+       }
+     }
    
+   /**
+    * Deletes all of the attachments on the specified execution
+    * @param executionId
+    */
+    public static void deleteAttachments(final String executionId) {
+      final ArrayList<String> fileIds = new ArrayList<String>();
+      // Note the IDs for the files currently attached to the execution
+      try {
+        final JSONObject obj = (JSONObject) get(ZAPI_URL + "attachment/attachmentsByEntity?entityId=" + executionId + "&entityType=EXECUTION");
+        if(null != obj) {
+          final JSONArray data = (JSONArray) obj.get("data");
+          for(int i = 0; i < data.length(); i++) {
+            final JSONObject fileData =  data.getJSONObject(i);
+            fileIds.add(fileData.getString("fileId"));
+          }
+        }
+      } catch (final JSONException e) {
+        e.printStackTrace();
+      }
+      
+      //Iterate over attachments
+      for(final String fileId : fileIds) {
+        delete(ZAPI_URL + "attachment/" + fileId);
+      }
+    }
+    
    //================================================================================
    // HTTP request methods
    //================================================================================
