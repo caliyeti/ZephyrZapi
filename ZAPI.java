@@ -1,21 +1,17 @@
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamReader;
+import java.io.OutputStreamWriter;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
@@ -58,7 +54,7 @@ public class ZAPI {
    public static String getVersionID(final String versionName, final String projectId) {
      try {
        //Get list of versions on the specified project
-       final JSONObject obj = (JSONObject) get(ZAPIURL + "util/versionBoard-list?projectId=" + projectId);
+       final JSONObject obj = (JSONObject) get(ZAPI_URL + "util/versionBoard-list?projectId=" + projectId);
        if(null != obj) {
           final JSONArray versionOptions = (JSONArray) obj.get("versionOptions");
           //Iterate over versions
@@ -73,7 +69,6 @@ public class ZAPI {
        }
      } catch (final JSONException e) {
        e.printStackTrace();
-     }
      }
      return null;
    }
@@ -95,7 +90,7 @@ public class ZAPI {
       }
       //Send PUT request
       put(ZAPI_URL + "execution/" + executionId + "/execute", obj);
-      }
+      
     }
     
     /**
@@ -105,14 +100,14 @@ public class ZAPI {
      */
      public static void addAttachment(final File file, final String executionId) {
        try {
-         final HttpPost = new HttpPost(ZAPI_URL + "attachment?entityId=" + executionId + "&entityType=EXECUTION");
+         final HttpPost httpPost = new HttpPost(ZAPI_URL + "attachment?entityId=" + executionId + "&entityType=EXECUTION");
          final String encoding = new Base64().encodeToString(CREDENTIALS.getBytes());
          httpPost.setHeader("X-Atlassian-Token", "nocheck");
          httpPost.setHeader("Authorization", "Basic " + encoding);
          
-         final MultippartEntity mpEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+         final MultipartEntity mpEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
          final ContentBody cbFile = new FileBody(file);
-         mpEntity.addPart("file", cbfile);
+         mpEntity.addPart("file", cbFile);
          httpPost.setEntity(mpEntity);
          final HttpResponse response = new DefaultHttpClient().execute(httpPost);
          final HttpEntity resEntity = response.getEntity();
