@@ -24,9 +24,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
  
 /** Helper class for calling ZAPI */
-public class ZAPI {
+public class Zapi {
  
     /** Status IDs enum */
+    /*
     public enum Status {
         PASS(1), FAIL(2), WIP(3), BLOCKED(4);
         private final int value;
@@ -39,7 +40,25 @@ public class ZAPI {
             return value;
         }
     }
- 
+    */
+    public static String getScenarioStatus(String statusInput) {
+        String outputStaus;
+        if (statusInput.toLowerCase().contains("PASS".toLowerCase())) {
+            outputStaus = "1";
+        } else if (statusInput.toLowerCase().contains("FAIL".toLowerCase())) {
+            outputStaus = "2";
+        } else if (statusInput.toLowerCase().contains("WIP".toLowerCase())) {
+            outputStaus = "3";
+        } else if (statusInput.toLowerCase().contains("BLOCKED".toLowerCase())) {
+            outputStaus = "4";
+        } else if (statusInput.toLowerCase().contains("SKIP".toLowerCase()) || statusInput.toLowerCase().contains("UNEXECUTED".toLowerCase())) {
+            outputStaus = "-1";
+        } else {
+            throw new IllegalArgumentException("Invalid Scenario of execution: " + statusInput);
+        }
+        return outputStaus;
+
+    }
     /** URLS */
     private static final String BASE_URL = "http://getzephyr.apiary.io/jira_server";
     private static final String ZAPI_URL = BASE_URL + "/rest/zapi/latest/";
