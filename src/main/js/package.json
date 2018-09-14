@@ -1,0 +1,16 @@
+{
+  "name": "portal-protractor",
+  "dependencies": {
+    "atlassian-jwt": "0.1.5",
+    "form-data": "2.1.2",
+    "jasmine-reporters": "2.3.0",
+    "jshashes": "1.0.7",
+    "request": "2.81.0",
+    "request-promise": "4.2.2",
+    "zapi_nodejs": "1.0.5"
+  },
+  "devDependencies": {
+    "protractor-html-screenshot-reporter": "0.0.21",
+    "protractor-screenshot-reporter": "0.0.5"
+  }
+}
